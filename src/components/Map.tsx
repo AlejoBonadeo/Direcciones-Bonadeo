@@ -1,6 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useRef, useState} from 'react';
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import MapView, {MapEvent, Marker, Polyline} from 'react-native-maps';
 import useLocation from '../hooks/useLocation';
+import useMarkers from '../hooks/useMarkers';
+import {Location} from '../interfaces/appInterfaces';
 import LoadingScreen from '../screens/LoadingScreen';
 import Fab from './Fab';
 
@@ -17,6 +20,7 @@ const Map = () => {
   const mapViewRef = useRef<MapView>();
   const following = useRef(true);
   const [showPolyline, setShowPolyline] = useState(true);
+  const {addMarker, markers, removeMarker} = useMarkers()
 
   useEffect(() => {
     followUser();
@@ -57,16 +61,22 @@ const Map = () => {
         style={{flex: 1}}
         showsUserLocation
         ref={el => (mapViewRef.current = el!)}
-        onTouchStart={() => (following.current = false)}>
-        {/* <Marker
-          image={require('../assets/custom-marker.png')}
-          coordinate={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-          }}
-          title="Place Name"
-          description="Place Description"
-        /> */}
+        onTouchStart={() => (following.current = false)}
+        onPress={addMarker}>
+          {
+            markers.map(({latitude, longitude}, i) => (
+              <Marker
+                key={Math.random()}
+                image={require('../assets/custom-marker.png')}
+                coordinate={{
+                  latitude,
+                  longitude,
+                }}
+                title={"Marker " + i}
+                onPress={() => removeMarker(i)}
+              />
+            ))
+          }
         {showPolyline && (
           <Polyline
             coordinates={polylines}
