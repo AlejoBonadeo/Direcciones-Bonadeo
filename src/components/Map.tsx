@@ -66,7 +66,7 @@ const Map = () => {
           {
             markers.map(({latitude, longitude}, i) => (
               <Marker
-                key={Math.random()}
+                key={JSON.stringify({latitude, longitude})}
                 image={require('../assets/custom-marker.png')}
                 coordinate={{
                   latitude,
